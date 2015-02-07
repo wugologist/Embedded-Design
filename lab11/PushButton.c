@@ -1,3 +1,10 @@
+/*
+*@file PushButton.c
+*@authors Zamir Johl and Michael Wong
+*@short Allows the user to control the value of the LEDs using push-buttons
+*@description This program adds the userio_PushButton function which is used to control the value of the LEDs. This value was set but the disposition of teh switches when the program starts or when the centre button is pressed. 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -163,64 +170,54 @@ int main()
 		return -1;
 	}	
 
-//	unsigned int btstate = userio_pushButtonGet(pMemBase);
-//	printf("Value is %d\n", btstate);
-//	userio_ledSetAll(pMemBase, btstate);
 
-	unsigned int initstate = userio_switchGet(pMemBase);
-//	printf("State = %d\n", swstate);
-	userio_ledSetAll(pMemBase, initstate);
+
+	unsigned int initstate = userio_switchGet(pMemBase); ///Determines the state of the switches and stores the value in the initstate variable
+
+	userio_ledSetAll(pMemBase, initstate); ///Sets the LEDs to the same state as the switches based upon the value stored in initstate
 	
 	unsigned int counter = initstate; ///current state = initial state
 	unsigned int prev = 0; ///previous states of the buttons
+	
+	/**
+	*Loop continues until program ends
+	*When the previous state is zero, the action associated with the button pressed (first in sequential order)
+	*is implemented on the counter variable and then this variable is sent to userio_ledSetAll.
+	*/
+	
 	while(1)
 	{
-		unsigned int state = userio_pushButtonGet(pMemBase);
+		unsigned int state = userio_pushButtonGet(pMemBase); ///The button being pressed is determined
+		unsigned int initstate = userio_switchGet(pMemBase); ///Determines the state of the switches and stores the value in the initstate variable
 		
-		if(state == 1 && !prev)
+		if(state == 1 && !prev) ///If the up button is pressed and the previous state was zero
 		{
-			counter++;
-			prev = 1;
+			counter++;  ///The counter is increased by one
+			prev = 1;   ///The previous state is set to zero
 		}
 		
-		else if(state == 4 && !prev)
+		else if(state == 4 && !prev) ///If the down button is pressed and the previous state was zero
 		{
-			counter--;
-			prev = 1;
+			counter--; ///The counter is decreased by 1
+			prev = 1;  ///The previous state is set to zero
 		}
 		
-		else if(state == 16 && !prev)
+		else if(state == 16 && !prev) ///If the centre button is pressed and the previous state was zero
 		{
-			counter = initstate;
-			prev = 1;
+			counter = initstate; ///The counter is reset to the state of the switches
+			prev = 1; ///The previous state is set to zero
 		}
 
-		else if(state == 0)
+		else if(state == 0) ///If no button is pressed
 		{
-			prev = 0;
+			prev = 0;  ///The previous state is set to zero
 		}
 		
-		userio_ledSetAll(pMemBase, counter);
+		userio_ledSetAll(pMemBase, counter); ///The LEDs are set to reflect the value of the counter
 	}
-//	int lednum, state;
-//	printf("Enter the number of the LED (0-7): \n");
-//	scanf("%d", &lednum);
-	
-//	printf("\nEnter the state of the LED (0 or 1): \n");
-//	scanf("%d", &state);
-	
-//	printf("\nChanging LED %d to state %d\n", lednum, state);
-//	userio_ledSet(pMemBase, lednum, state);
-	
-	//int value = 0;
-	//printf("Enter a value less than 256: ");
-	//scanf("%d", &value);
-	//printf("value = %d\n", value);
 
-	// Show the value on the Zedboard LEDs
-	//userio_ledSetAll(pMemBase, value);
 
-	// close userio module
+	/// close userio module
 	userio_deinit(pMemBase, fd);
 
 	return 0;
