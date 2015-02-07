@@ -124,9 +124,9 @@ int main()
 	
 	printf("\nChanging LED %d to state %d\n", lednum, state);  ///Notifies the user of the LED number and the state that that LED will be set to
 	
-	///Calls the userio_ledset function which calls the macro REG_WRITE and 
+	/**Calls the userio_ledset function which calls the macro REG_WRITE and 
 	///provides it with the pMemBase and offset for the LEDs. This causes 
-	///the selected LED to be set to the desired state.
+	*/the selected LED to be set to the desired state.
 	userio_ledSet(pMemBase, lednum, state); 
 	
 	/// close userio module
