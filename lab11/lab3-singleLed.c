@@ -106,7 +106,7 @@ int main()
 {
 	int fd;
 	
-	// open userio module
+	/// open userio module
 	unsigned char *pMemBase = userio_init(&fd);
 	
 	if(pMemBase == MAP_FAILED)
@@ -115,25 +115,21 @@ int main()
 		return -1;
 	}	
 	
-	int lednum, state;
-	printf("Enter the number of the LED (0-7): \n");
-	scanf("%d", &lednum);
+	unsigned int lednum, state;  ///Initializes variables for the number of the LED and the desired state
+	printf("Enter the number of the LED (0-7): \n");  ///Prompts the user for the number of the LED to be selected 0-7
+	scanf("%d", &lednum);  ///Stores the number of the LED from 0-7 in the variable lednum
 	
-	printf("\nEnter the state of the LED (0 or 1): \n");
-	scanf("%d", state);
+	printf("\nEnter the state of the LED (0 or 1): \n");  ///Prompts the user for the desired state of the LED, 0 for off, 1 for on
+	scanf("%d", state);  ///Stores the value of the desired state in the variable state
 	
-	printf("\nChanging LED %d to state %d\n", lednum, state);
-	userio_ledSet(pMemBase, lednum, state);
+	printf("\nChanging LED %d to state %d\n", lednum, state);  ///Notifies the user of the LED number and the state that that LED will be set to
 	
-	//int value = 0;
-	//printf("Enter a value less than 256: ");
-	//scanf("%d", &value);
-	//printf("value = %d\n", value);
-
-	// Show the value on the Zedboard LEDs
-	//userio_ledSetAll(pMemBase, value);
-
-	// close userio module
+	///Calls the userio_ledset function which calls the macro REG_WRITE and 
+	///provides it with the pMemBase and offset for the LEDs. This causes 
+	///the selected LED to be set to the desired state.
+	userio_ledSet(pMemBase, lednum, state); 
+	
+	/// close userio module
 	userio_deinit(pMemBase, fd);
 
 	return 0;
