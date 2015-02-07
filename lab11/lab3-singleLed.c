@@ -1,3 +1,10 @@
+/*
+*@file lab3-singleLed.c
+*@authors Zamir Johl and Michael Wong
+*@short skeleton program with a function to control a single LED
+*@description This program adds the userio_ledSet function which, given an LED and the desired state, will set the LED to that state
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -125,8 +132,9 @@ int main()
 	printf("\nChanging LED %d to state %d\n", lednum, state);  ///Notifies the user of the LED number and the state that that LED will be set to
 	
 	/**Calls the userio_ledset function which calls the macro REG_WRITE and 
-	///provides it with the pMemBase and offset for the LEDs. This causes 
-	*/the selected LED to be set to the desired state.
+	*provides it with the pMemBase and offset for the LEDs. This causes 
+	*the selected LED to be set to the desired state.
+	*/
 	userio_ledSet(pMemBase, lednum, state); 
 	
 	/// close userio module
