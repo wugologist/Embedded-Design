@@ -1,3 +1,10 @@
+/*
+*@file switchGet.c
+*@authors Zamir Johl and Michael Wong
+*@short Uses switchGet function to set LEDs to match switches
+*@description This program adds the userio_switchGet function which, based upon the position of the switches, will set the LEDs to that state
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -101,17 +108,26 @@ void userio_ledSet(unsigned char *pBase, unsigned int ledNr, unsigned int state)
 	REG_WRITE(pBase, offset, state); ///write the state to the specified LED address
 }
 
+/**
+*@short Returns state of the switches
+*
+*@descrip This function uses an 8-bit value to store the positions of the bank of switches on the ZEDBoard. This is accomplished by going to each switch and adding its state to the stored value. This is then left shifted to better represent the values.
+*@param pBase the location of the beginning of the LEDs in memory
+*@return an unsigned int with each bit representing the value of a switch on the ZEDBoard
+*/
+
 unsigned int userio_switchGet(unsigned char *pBase)
 {
-	int i;
-	unsigned int swoffset = 0x14C;
-	unsigned int offset;
-	unsigned int state = 0;
-	for(i=7; i>=0; i--)
+	int i;  ///A counter int 
+	unsigned int swoffset = 0x14C;  ///The location of the first switch in memory
+	unsigned int offset; ///The distance between the locations of each switch in memory
+	unsigned int state = 0; ///
+	
+	for(i=7; i>=0; i--) ///A for loop that goes through each switch, starting with the leftmost (number seven) and decrementing each iteration
 	{
-		offset = swoffset + 4*i;
-		state = state << 1;
-		state += REG_READ(pBase, offset);
+		offset = swoffset + 4*i; ///Each switch address is 4 for than the last, meaning that the offset can be calculated by adding the offset of the first to the relative location of the current switch
+		state = state << 1; ///After the position (0 or 1) of each switch is determined, the state should be left shifted to make room for the next switch's position
+		state += REG_READ(pBase, offset); ///Calls REG_READ for each switch to determine the position that that switch is at and then adds it the the unsigned int state
 	}
 	return state;
 }
@@ -120,7 +136,7 @@ int main()
 {
 	int fd;
 	
-	// open userio module
+	/// open userio module
 	unsigned char *pMemBase = userio_init(&fd);
 	
 	if(pMemBase == MAP_FAILED)
@@ -129,32 +145,23 @@ int main()
 		return -1;
 	}	
 
-	while(1)
-{
+	while(1) ///Loops until program is ended
+	{
+	
+	/**The userio_switchGet function is called to determine the "state" of the switches.
+	*This returns the value of the number to be represented by the LEDs. This value is
+	*stored in an unsigned int called swstate
+	*/
 	unsigned int swstate = userio_switchGet(pMemBase);
-//	printf("State = %d\n", swstate);
+	
+	///Calls the userio_ledSetAll function which changes the states of the LED to represent the values represented by the switches
 	userio_ledSetAll(pMemBase, swstate);
-}
 	
-//	int lednum, state;
-//	printf("Enter the number of the LED (0-7): \n");
-//	scanf("%d", &lednum);
+	}
 	
-//	printf("\nEnter the state of the LED (0 or 1): \n");
-//	scanf("%d", &state);
-	
-//	printf("\nChanging LED %d to state %d\n", lednum, state);
-//	userio_ledSet(pMemBase, lednum, state);
-	
-	//int value = 0;
-	//printf("Enter a value less than 256: ");
-	//scanf("%d", &value);
-	//printf("value = %d\n", value);
 
-	// Show the value on the Zedboard LEDs
-	//userio_ledSetAll(pMemBase, value);
 
-	// close userio module
+	/// close userio module
 	userio_deinit(pMemBase, fd);
 
 	return 0;
