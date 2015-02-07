@@ -64,16 +64,16 @@ unsigned char *userio_init(int *fd) //initialize userio module
  *@param pBase	base address of userio
  *@param value	value to show on LEDs
  */
-void userio_ledSetAll(unsigned char *pBase, int value)
+void userio_ledSetAll(unsigned char *pBase, int value) //set the LEDs to display a binary number
 {
-	REG_WRITE(pBase, LED1_OFFSET, value%2);
-	REG_WRITE(pBase, LED2_OFFSET, (value/2)%2);
-	REG_WRITE(pBase, LED3_OFFSET, (value/4)%2);
-	REG_WRITE(pBase, LED4_OFFSET, (value/8)%2);
-	REG_WRITE(pBase, LED5_OFFSET, (value/16)%2);
-	REG_WRITE(pBase, LED6_OFFSET, (value/32)%2);
-	REG_WRITE(pBase, LED7_OFFSET, (value/64)%2);
-	REG_WRITE(pBase, LED8_OFFSET, (value/128)%2);
+	REG_WRITE(pBase, LED1_OFFSET, value%2); //write the first bit to LED1
+	REG_WRITE(pBase, LED2_OFFSET, (value/2)%2); //write the second bit to LED2
+	REG_WRITE(pBase, LED3_OFFSET, (value/4)%2); //write the third bit to LED3
+	REG_WRITE(pBase, LED4_OFFSET, (value/8)%2); //write the fourth bit to LED4
+	REG_WRITE(pBase, LED5_OFFSET, (value/16)%2); //write the fifth bit to LED5
+	REG_WRITE(pBase, LED6_OFFSET, (value/32)%2); //write the sixth bit to LED6
+	REG_WRITE(pBase, LED7_OFFSET, (value/64)%2); //write the seventh bit to LED7
+	REG_WRITE(pBase, LED8_OFFSET, (value/128)%2); //write the eighth bit to LED8
 }
 
 /**

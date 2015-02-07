@@ -1,15 +1,8 @@
-/*
-*@file lab3-singleLed.c
-*@authors Zamir Johl and Michael Wong
-*@short skeleton program with a function to control a single LED
-*@description This program adds the userio_ledSet function which, given an LED and the desired state, will set the LED to that state
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/mman.h>
+#include <stdio.h> //library for console i/o
+#include <stdlib.h> //several functions, including memory allocation
+#include <fcntl.h> //allows for manipulating files
+#include <unistd.h> //allows access to POSIX OS API
+#include <sys/mman.h> //for memory mapping
 
 // physical base address of GPIO
 #define GPIO_ADDRESS	0x400D0000
@@ -40,8 +33,8 @@
 #define PBTND_OFFSET	0x178  /* Offset for down push button */
 #define PBTNC_OFFSET	0x17C  /* Offset for center push button */
 
-#define REG_WRITE(addr, off, val) (*(volatile int*)(addr+off)=(val))
-#define REG_READ(addr,off) (*(volatile int*)(addr+off))
+#define REG_WRITE(addr, off, val) (*(volatile int*)(addr+off)=(val)) //macro to write val to the specified memory location (addr+off)
+#define REG_READ(addr,off) (*(volatile int*)(addr+off)) //macro to read the value at memory location (addr+off)
 
 /**
  * Initialize userio module.
@@ -52,18 +45,18 @@
  *@return  address to virtual memory which is mapped to physical,
  *          or MAP_FAILED on error.
  */
-unsigned char *userio_init(int *fd)
+unsigned char *userio_init(int *fd) //initialize userio module
 {
-	unsigned long int PhysicalAddress = GPIO_ADDRESS;
-	int map_len = GPIO_MAP_LEN;
-	unsigned char *pBase;
+	unsigned long int PhysicalAddress = GPIO_ADDRESS; //assign the physical memory address of the GPIO locations
+	int map_len = GPIO_MAP_LEN; //the amount of memory to be assigned to GPIO
+	unsigned char *pBase; //pointer to the beginning of the memory-mapped physical elements
 
-	*fd = open( "/dev/mem", O_RDWR);
+	*fd = open( "/dev/mem", O_RDWR); //open a file with read and write permissions
 
 	pBase = (unsigned char*)mmap(NULL, map_len, PROT_READ |
-				PROT_WRITE, MAP_SHARED, *fd, (off_t)PhysicalAddress);
+				PROT_WRITE, MAP_SHARED, *fd, (off_t)PhysicalAddress); //map the physical locations to memory
 
-	return pBase;
+	return pBase; //return the first address
 }
 
 /**
@@ -71,16 +64,16 @@ unsigned char *userio_init(int *fd)
  *@param pBase	base address of userio
  *@param value	value to show on LEDs
  */
-void userio_ledSetAll(unsigned char *pBase, int value)
+void userio_ledSetAll(unsigned char *pBase, int value) //set the LEDs to display a binary number
 {
-	REG_WRITE(pBase, LED1_OFFSET, value%2);
-	REG_WRITE(pBase, LED2_OFFSET, (value/2)%2);
-	REG_WRITE(pBase, LED3_OFFSET, (value/4)%2);
-	REG_WRITE(pBase, LED4_OFFSET, (value/8)%2);
-	REG_WRITE(pBase, LED5_OFFSET, (value/16)%2);
-	REG_WRITE(pBase, LED6_OFFSET, (value/32)%2);
-	REG_WRITE(pBase, LED7_OFFSET, (value/64)%2);
-	REG_WRITE(pBase, LED8_OFFSET, (value/128)%2);
+	REG_WRITE(pBase, LED1_OFFSET, value%2); //write the first bit to LED1
+	REG_WRITE(pBase, LED2_OFFSET, (value/2)%2); //write the second bit to LED2
+	REG_WRITE(pBase, LED3_OFFSET, (value/4)%2); //write the third bit to LED3
+	REG_WRITE(pBase, LED4_OFFSET, (value/8)%2); //write the fourth bit to LED4
+	REG_WRITE(pBase, LED5_OFFSET, (value/16)%2); //write the fifth bit to LED5
+	REG_WRITE(pBase, LED6_OFFSET, (value/32)%2); //write the sixth bit to LED6
+	REG_WRITE(pBase, LED7_OFFSET, (value/64)%2); //write the seventh bit to LED7
+	REG_WRITE(pBase, LED8_OFFSET, (value/128)%2); //write the eighth bit to LED8
 }
 
 /**
@@ -89,12 +82,13 @@ void userio_ledSetAll(unsigned char *pBase, int value)
  *@param pBase	base address
  *@param fd     file descriptor to close
  */
-void userio_deinit(unsigned char *pBase, int fd)
+void userio_deinit(unsigned char *pBase, int fd) //free memory used by userio_init
 {
-	int map_len = GPIO_MAP_LEN;
-	munmap((void *)pBase, map_len);
-	close(fd);
+	int map_len = GPIO_MAP_LEN; //length of the memory chunk taken by GPIO
+	munmap((void *)pBase, map_len); //unmap the memory
+	close(fd); //close the file
 }
+
 
 ///set the value of a single specified LED
 ///@param pBase the location of the beginning of the LEDs in memory
@@ -111,15 +105,15 @@ void userio_ledSet(unsigned char *pBase, unsigned int ledNr, unsigned int state)
 
 int main()
 {
-	int fd;
+	int fd; //file descriptor
 	
 	/// open userio module
 	unsigned char *pMemBase = userio_init(&fd);
 	
-	if(pMemBase == MAP_FAILED)
+	if(pMemBase == MAP_FAILED) //check if user_io broke
 	{
-		perror("Mapping memory for absolute memory access failed -- Test Try\n");
-		return -1;
+		perror("Mapping memory for absolute memory access failed -- Test Try\n"); //raise error
+		return -1; //return non-zero value
 	}	
 	
 	unsigned int lednum, state;  ///Initializes variables for the number of the LED and the desired state
@@ -140,5 +134,5 @@ int main()
 	/// close userio module
 	userio_deinit(pMemBase, fd);
 
-	return 0;
+	return 0; //exit
 }
